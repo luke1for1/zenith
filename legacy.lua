@@ -19,7 +19,7 @@ local function gameStarted()
 
     rep.StartDungeon:FireServer()
 
-    task.wait(4)
+    task.wait(3)
 
     spawn(function()
         while task.wait() do
