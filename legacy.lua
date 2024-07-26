@@ -48,6 +48,7 @@ local function gameStarted()
 
     for _, position in ipairs(positions) do
         tweenToPosition(position)
+        task.wait(0.5)
     end
 end
 
