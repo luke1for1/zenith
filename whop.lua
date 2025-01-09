@@ -41,7 +41,7 @@ local function hop()
                     sendNotif()
                     return true
                 end
-                queue_on_teleport(game:HttpGet("https://e-z.tools/p/raw/qa6az4va4w"))
+                queue_on_teleport(game:HttpGet("https://raw.githubusercontent.com/luke1for1/zenith/refs/heads/main/whop.lua"))
                 teleportService:TeleportToPlaceInstance(placeID, serverID, game.Players.LocalPlayer)
             end)
             if hopSuccess then
