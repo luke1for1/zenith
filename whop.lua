@@ -2,12 +2,11 @@ repeat task.wait() until game:IsLoaded()
 print("Loaded")
 
 local httpService = game:GetService("HttpService")
-
 local placeID = game.PlaceId
 local teleportService = game:GetService("TeleportService")
 local Found = false
 
-local function checkForViciousBee()
+local function checkForWindyBee()
     for _, child in ipairs(game:GetService("Workspace").NPCBees:GetChildren()) do
         if string.find(child.Name, "Windy") then
             Found = true
@@ -16,6 +15,7 @@ local function checkForViciousBee()
     end
     return false
 end
+
 local function sendNotif()
     game.StarterGui:SetCore("SendNotification", {
         Title = "Windy Bee Hopper",
@@ -57,7 +57,7 @@ game:GetService("Workspace").NPCBees.ChildAdded:Connect(function(child)
     end
 end)
 
-if not checkForViciousBee() then
+if not checkForWindyBee() then
     hop()
 else
     sendNotif()
