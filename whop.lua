@@ -47,7 +47,6 @@ local function hop()
                     return true
                 end
 
-                -- Queue the current script for the next teleport
                 queue_on_teleport([[
                     loadstring(game:HttpGet("https://raw.githubusercontent.com/luke1for1/zenith/refs/heads/main/whop.lua"))()
                 ]])
