@@ -19,11 +19,9 @@ local function sendWebhook(chance, name)
         color = 255
     end
 
-    if webhook ~= "" then
+    if getgenv().webhook and getgenv().webhook ~= "" then
         local mention = ""
-        if getgenv().UserId ~= nil or 0 then
-            mention = ""
-        else
+        if getgenv().UserId and getgenv().UserId ~= 0 then
             mention = "<@" .. getgenv().UserId .. ">"
         end
 
@@ -64,6 +62,7 @@ local function sendWebhook(chance, name)
             warn("Webhook failed with status code: " .. response.StatusCode)
         end
     end
+
     print("sent webhook")
 end
 
@@ -78,11 +77,11 @@ while true do
         for _, v in ipairs(lastHatch:GetChildren()) do
             if v:IsA("Frame") then
                 local chance = v:FindFirstChild("Chance")
-                if chance then
-                    local hatchedName = v.Name
-                    local hatchedChance = tonumber(chance.Text:gsub("%%", ""))
+                if chance and chance:IsA("TextLabel") then
+                    local rawChance = chance.Text:gsub("%%", "")
+                    local hatchedChance = tonumber(rawChance)
                     if hatchedChance and hatchedChance <= getgenv().highestChance then
-                        sendWebhook(hatchedChance, hatchedName)
+                        sendWebhook(hatchedChance, v.Name)
                     end
                 end
             end
