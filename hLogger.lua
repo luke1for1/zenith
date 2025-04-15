@@ -27,6 +27,8 @@ local function sendWebhook(chance, name)
             mention = "<@" .. getgenv().UserId .. ">"
         end
 
+        local oneIn = math.floor(100 / chance)
+
         local data = {
             ["content"] = mention,
             ["embeds"] = { {
@@ -41,7 +43,7 @@ local function sendWebhook(chance, name)
                     },
                     {
                         ["name"] = "Chance",
-                        ["value"] = tostring(chance) .. "%",
+                        ["value"] = tostring(chance) .. "% & 1/" .. oneIn,
                         ["inline"] = true
                     }
                 },
