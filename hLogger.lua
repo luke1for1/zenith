@@ -44,7 +44,7 @@ local function sendWebhook(chance, name)
         }
 
         local response = request({
-            Url = webhook,
+            Url = getgenv().webhook,
             Method = "POST",
             Headers = {
                 ["Content-Type"] = "application/json"
