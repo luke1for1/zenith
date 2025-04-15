@@ -74,8 +74,8 @@ while task.wait(2) do
     if hatched then
         for i, v in ipairs(hatched) do
             task.wait()
-            local hatchedName = Name
-            local hatchedChance = string.gsub(Chance, "%%", "")
+            local hatchedName = v.Name
+            local hatchedChance = string.gsub(v.Chance, "%%", "")
 
             print(hatchedName, hatchedChance)
             if hatchedChance <= tonumber(getgenv().highestChance) then
