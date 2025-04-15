@@ -1,7 +1,3 @@
-getgenv().UserId = nil
-getgenv().highestChance = 1
-getgenv().webhook = "https://discord.com/api/webhooks/1360758785920073909/6P30BRv0CdSrs3UD4e9NQntggVbGHqeDFKHMroAA5fTgXfQZzg2ivt3_k9G6oGMW98Wx"
-
 local lastHatch = game.Players.LocalPlayer:WaitForChild("PlayerGui").ScreenGui:FindFirstChild("Hatching"):FindFirstChild("Last")
 
 if lastHatch then
@@ -72,9 +68,9 @@ end
 local hasRun = false
 
 while true do
-    task.wait()
-    
-    if lastHatch and lastHatch.Parent == visible and not hasRun then
+    task.wait(1)
+
+    if lastHatch.Visible and not hasRun then
         hasRun = true
 
         for _, v in ipairs(lastHatch:GetChildren()) do
@@ -89,7 +85,8 @@ while true do
                 end
             end
         end
-    elseif lastHatch and lastHatch.Parent ~= visible then
+
+    elseif not lastHatch.Visible then
         hasRun = false
     end
 end
