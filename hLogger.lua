@@ -1,3 +1,7 @@
+getgenv().UserId = nil
+getgenv().highestChance = 1
+getgenv().webhook = "https://discord.com/api/webhooks/1360758785920073909/6P30BRv0CdSrs3UD4e9NQntggVbGHqeDFKHMroAA5fTgXfQZzg2ivt3_k9G6oGMW98Wx"
+
 local lastHatch = game.Players.LocalPlayer:WaitForChild("PlayerGui").ScreenGui:FindFirstChild("Hatching"):FindFirstChild("Last")
 
 if lastHatch then
@@ -65,26 +69,27 @@ local function sendWebhook(chance, name)
     print("sent webhook")
 end
 
+local hasRun = false
+
 while true do
-    task.wait(1.5) 
-    if lastHatch then
-        for i, v in ipairs(lastHatch:GetChildren()) do
-            task.wait()
+    task.wait()
+    
+    if lastHatch and lastHatch.Parent == visible and not hasRun then
+        hasRun = true
+
+        for _, v in ipairs(lastHatch:GetChildren()) do
             if v:IsA("Frame") then
                 local chance = v:FindFirstChild("Chance")
                 if chance then
                     local hatchedName = v.Name
-                    local hatchedChanceText = string.gsub(chance.Text, "%%", "")
-                    local hatchedChance = tonumber(hatchedChanceText)
-
-                    if hatchedChance then
-                        print(hatchedName, hatchedChance)
-                        if hatchedChance <= getgenv().highestChance then
-                            sendWebhook(hatchedChance, hatchedName)
-                        end 
+                    local hatchedChance = tonumber(chance.Text:gsub("%%", ""))
+                    if hatchedChance and hatchedChance <= getgenv().highestChance then
+                        sendWebhook(hatchedChance, hatchedName)
                     end
                 end
             end
         end
+    elseif lastHatch and lastHatch.Parent ~= visible then
+        hasRun = false
     end
 end
