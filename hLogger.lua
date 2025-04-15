@@ -1,3 +1,4 @@
+
 local lastHatch = game.Players.LocalPlayer:WaitForChild("PlayerGui").ScreenGui:FindFirstChild("Hatching"):FindFirstChild("Last")
 
 if lastHatch then
@@ -14,11 +15,10 @@ local function sendWebhook(chance, name)
 
     if webhook ~= "" then
 
-        local mention = ""
         if getgenv().UserId ~= nil or 0 then
-            mention = ""
+            local mention = ""
         else
-            mention = getgenv().UserId
+            local mention = "<@" .. getgenv().UserId .. ">"
         end
 
         local data = {
@@ -71,14 +71,14 @@ while task.wait(2) do
             end
         end
     end
-    if #hatched > 0 then
+    if hatched then
         for i, v in ipairs(hatched) do
             task.wait()
-            local hatchedName = v.Name
-            local hatchedChance = string.gsub(v.Chance, "%%", "")
+            local hatchedName = Name
+            local hatchedChance = string.gsub(Chance, "%%", "")
 
             print(hatchedName, hatchedChance)
-            if tonumber(hatchedChance) <= tonumber(getgenv().highestChance) then
+            if hatchedChance <= tonumber(getgenv().highestChance) then
                 sendWebhook(hatchedChance, hatchedName)
             end
         end
