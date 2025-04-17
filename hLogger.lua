@@ -1,93 +1,90 @@
-local lastHatch = game.Players.LocalPlayer:WaitForChild("PlayerGui").ScreenGui:FindFirstChild("Hatching"):FindFirstChild("Last")
+local lastHatch = game.Players.LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("ScreenGui"):WaitForChild("Hatching"):WaitForChild("Last")
 
-if lastHatch then
-    print("found")
-end
+local requestFunc = (syn and syn.request) or http_request or request
+if not requestFunc then error("Your executor doesn't support HTTP requests.") end
 
 local HttpService = game:GetService("HttpService")
 
-local function sendWebhook(chance, name)
-    local time = math.floor(os.time() + 600)
-    local timestamp = "<t:" .. time .. ":R>"
+local function sendWebhook(chance, name, asset)
+    local color = (chance <= 0.005 and 16776960) or (chance <= 0.05 and 255) or 255
+    local oneIn = math.floor(100 / chance)
+    local mention = (getgenv().UserId and getgenv().UserId ~= 0) and "<@" .. getgenv().UserId .. ">"
 
-    local color
-    if chance <= 0.005 then
-        color = 16776960
-    elseif chance <= 0.05 then
-        color = 255
+    local assetId = asset:match("%d+")
+
+    local thumbUrl = ""
+    local response = requestFunc({
+        Url = "https://thumbnails.roblox.com/v1/assets?assetIds=" .. assetId .. "&size=420x420&format=png",
+        Method = "GET"
+    })
+
+    if response and response.StatusCode == 200 then
+        local data = HttpService:JSONDecode(response.Body)
+        if data and data.data and #data.data > 0 then
+            thumbUrl = data.data[1].imageUrl 
+        end
     else
-        color = 255
+        warn("Failed to fetch image URL. Status code:", response and response.StatusCode)
     end
 
-    if getgenv().webhook and getgenv().webhook ~= "" then
-        local mention = ""
-        if getgenv().UserId and getgenv().UserId ~= 0 then
-            mention = "<@" .. getgenv().UserId .. ">"
-        end
-
-        local oneIn = math.floor(100 / chance)
-
-        local data = {
-            ["content"] = mention,
-            ["embeds"] = { {
-                ["title"] = "Pet Hatched:",
-                ["description"] = "You have hatched a rare pet!",
-                ["color"] = color,
-                ["fields"] = {
-                    {
-                        ["name"] = "Pet Name",
-                        ["value"] = tostring(name),
-                        ["inline"] = true
-                    },
-                    {
-                        ["name"] = "Chance",
-                        ["value"] = tostring(chance) .. "% & 1/" .. oneIn,
-                        ["inline"] = true
-                    }
-                },
-                ["timestamp"] = os.date("!%Y-%m-%dT%H:%M:%SZ")
-            } }
-        }
-
-        local response = request({
-            Url = getgenv().webhook,
-            Method = "POST",
-            Headers = {
-                ["Content-Type"] = "application/json"
+    local data = {
+        content = mention,
+        embeds = { {
+            title = "Pet Hatched:",
+            description = "You have hatched a rare pet!",
+            color = color,
+            fields = {
+                {name = "Pet Name", value = tostring(name), inline = true},
+                {name = "Chance", value = tostring(chance) .. "% & 1/" .. oneIn, inline = true}
             },
-            Body = HttpService:JSONEncode(data)
-        })
+            thumbnail = { url = thumbUrl },
+            timestamp = os.date("!%Y-%m-%dT%H:%M:%SZ")
+        } }
+    }
 
-        if response.StatusCode ~= 200 then
-            warn("Webhook failed with status code: " .. response.StatusCode)
-        end
+    local response = requestFunc({
+        Url = getgenv().webhook,
+        Method = "POST",
+        Headers = {["Content-Type"] = "application/json"},
+        Body = HttpService:JSONEncode(data)
+    })
+
+    if not response or response.StatusCode ~= 200 then
+        warn("Webhook failed. Code:", response and response.StatusCode)
     end
-
-    print("sent webhook")
 end
 
 local hasRun = false
 
-while true do
-    task.wait(1)
+spawn(function()
+    while true do
+        task.wait()
+        if lastHatch.Parent.Visible and not hasRun then
+            hasRun = true
+            for _, v in ipairs(lastHatch:GetChildren()) do
+                if v:IsA("Frame") then
+                    local chance = v:FindFirstChild("Chance")
+                    local petName = v:FindFirstChild("PetName") or v:FindFirstChildOfClass("TextLabel")
+                    local imageId = v:FindFirstChild("Icon") and v.Icon:FindFirstChild("Label") and v.Icon.Label.Image
 
-    if lastHatch.Visible and not hasRun then
-        hasRun = true
+                    if chance and chance:IsA("TextLabel") then
+                        local rawChance = chance.Text:gsub("%%", "")
+                        local hatchedChance = tonumber(rawChance)
 
-        for _, v in ipairs(lastHatch:GetChildren()) do
-            if v:IsA("Frame") then
-                local chance = v:FindFirstChild("Chance")
-                if chance and chance:IsA("TextLabel") then
-                    local rawChance = chance.Text:gsub("%%", "")
-                    local hatchedChance = tonumber(rawChance)
-                    if hatchedChance and hatchedChance <= getgenv().highestChance then
-                        sendWebhook(hatchedChance, v.Name)
+                        if v.Icon and v.Icon.Label and v.Icon.Label.Shine then
+                            n = "Shiny " .. v.Name
+                        else
+                            n = v.Name
+                        end
+
+                        if hatchedChance and hatchedChance <= getgenv().highestChance then
+                            sendWebhook(hatchedChance, n, imageId)
+                        end
                     end
                 end
             end
+        elseif not lastHatch.Parent.Visible then
+            hasRun = false
         end
-
-    elseif not lastHatch.Visible then
-        hasRun = false
     end
-end
+end)
