@@ -71,12 +71,18 @@ spawn(function()
                         local rawChance = chance.Text:gsub("%%", "")
                         local hatchedChance = tonumber(rawChance)
 
-                        if v.Icon and v.Icon.Label and v.Icon.Label:FindFirstChild("Shine") then
-                            n = "Shiny " .. v.Name
-                        else
-                            n = v.Name
+                        local isShiny = false
+                        if v:FindFirstChild("Icon") and v.Icon:FindFirstChild("Label") then
+                            local label = v.Icon.Label
+                            if typeof(label) == "Instance" and label:IsA("GuiObject") then
+                                if label:FindFirstChild("Shine") then
+                                    isShiny = true
+                                end
+                            end
                         end
-
+                        
+                        local n = (isShiny and "Shiny " or "") .. v.Name
+                        
                         if hatchedChance and hatchedChance <= getgenv().highestChance then
                             sendWebhook(hatchedChance, n, imageId)
                         end
