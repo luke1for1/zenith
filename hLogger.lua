@@ -1,4 +1,3 @@
-
 local lastHatch = game.Players.LocalPlayer:WaitForChild("PlayerGui"):WaitForChild("ScreenGui"):WaitForChild("Hatching"):WaitForChild("Last")
 
 local requestFunc = (syn and syn.request) or http_request or request
@@ -72,8 +71,7 @@ spawn(function()
                         local rawChance = chance.Text:gsub("%%", "")
                         local hatchedChance = tonumber(rawChance)
 
-                        local n 
-                        if v.Icon and v.Icon.Label and v.Icon.Label.Shine then
+                        if v.Icon and v.Icon.Label and v.Icon.Label:FindFirstChild("Shine") then
                             n = "Shiny " .. v.Name
                         else
                             n = v.Name
